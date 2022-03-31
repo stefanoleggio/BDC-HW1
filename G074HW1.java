@@ -44,10 +44,37 @@ public class G074HW1{
         //Subdivide the input file into K partitions
         JavaRDD<String> rawData = sc.textFile(file_path).repartition(K).cache();
 
+        //Task1
         //Print the number of rows read from the input file
         System.out.println("Number of rows read from the input file = " + rawData.count());
 
         JavaPairRDD<String, Long> productCustomer;
+
+
+        /*. PARSER
+        String[] review = reviewLine.split(",");
+                    String ProductID=review[1];
+                    Integer Quantity = Integer.parseInteger(review[3])
+                    Integer CustomerID=review[6];
+                    String Country = review[7]
+
+        */
+
+
+
+
+        //Tast2
+
+        //Task3
+
+        //Tast4
+
+        //Tast5
+
+        
+
+        //Tast6
+
     }
 
 }
