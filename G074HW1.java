@@ -50,16 +50,26 @@ public class G074HW1{
 
         JavaPairRDD<String, Long> productCustomer;
 
+        productCustomer = rawData
+                .flatMapToPair((line) -> {
+                    //Parsing
+                    String[] tokens = line.split(",");//Split the line separating with ','
+                    String productID = tokens[1];
+                    int quantity = Integer.parseInt(tokens[3]);
+                    long customerID = Long.parseLong(tokens[6]);
+                    String country = tokens[7];
+                    ArrayList<Tuple2<String, Long>> pairs = new ArrayList<>();
+                    if(S.compareTo(country) == 0 & quantity > 0) {
+                        pairs.add(new Tuple2<>(productID, customerID));
+                    }
+                    return pairs.iterator();
+                });
 
-        /*. PARSER
-        String[] review = reviewLine.split(",");
-                    String ProductID=review[1];
-                    Integer Quantity = Integer.parseInteger(review[3])
-                    Integer CustomerID=review[6];
-                    String Country = review[7]
+        System.out.println("Number of rows after filtering in productCustomer = " + productCustomer.count());
 
-        */
-
+        productCustomer.foreach(element -> {
+            System.out.print(element);
+        });
 
 
 
