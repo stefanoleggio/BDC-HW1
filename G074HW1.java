@@ -3,13 +3,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.storage.StorageLevel;
-import scala.None$;
 import scala.Tuple2;
-import scala.xml.Null;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
@@ -59,20 +53,20 @@ public class G074HW1{
                     String[] tokens = line.split(",");//Split the line separating with ','
                     String productID = tokens[1];
                     int quantity = Integer.parseInt(tokens[3]);
-                    long customerID = Long.parseLong(tokens[6]);
+                    String customerID = tokens[6];
                     String country = tokens[7];
                     ArrayList<Tuple2<String, Long>> pairs = new ArrayList<>();
                     if((S.compareTo(country) == 0 | S.compareTo("all") == 0) & quantity > 0) { //Selecting the data with country equal to S and quantity > 0
                         //The following passage has been done because we had to avoid the use of distinct, so we had to do a kind of dummy map phase
                         //Create a pair with the key equals to the union of the two ID separated by a "-" : "productID-customerID"
-                        //The value of the pair is the customerID, however it will be replaced in the following phases
-                        pairs.add(new Tuple2<>(productID + "-" + customerID, customerID));
+                        //The value of the pair is zero in long format
+                        pairs.add(new Tuple2<>(productID + "-" + customerID, 0L));
                     }
                     return pairs.iterator();
-                }).groupByKey().mapToPair(a -> {
+                }).groupByKey().mapToPair(pair -> {
                     //After grouping the couples that have the same key, so same productID and customerID, We parse the key into productID and customerID
-                    String[] tokens = a._1.split("-");
-                    return new Tuple2<String, Long>(tokens[0], Long.parseLong(tokens[1]));
+                    String[] tokens = pair._1.split("-");
+                    return new Tuple2<>(tokens[0], Long.parseLong(tokens[1]));
                 });
 
         System.out.println("Number of rows after filtering = " + productCustomer.count());
