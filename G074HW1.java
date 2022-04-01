@@ -4,7 +4,9 @@ import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.storage.StorageLevel;
+import scala.None$;
 import scala.Tuple2;
+import scala.xml.Null;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -60,11 +62,18 @@ public class G074HW1{
                     long customerID = Long.parseLong(tokens[6]);
                     String country = tokens[7];
                     ArrayList<Tuple2<String, Long>> pairs = new ArrayList<>();
-                    if((S.compareTo(country) == 0 | S.compareTo("all") == 0) & quantity > 0) {
-                        pairs.add(new Tuple2<>(productID, customerID));
+                    if((S.compareTo(country) == 0 | S.compareTo("all") == 0) & quantity > 0) { //Selecting the data with country equal to S and quantity > 0
+                        //The following passage has been done because we had to avoid the use of distinct, so we had to do a kind of dummy map phase
+                        //Create a pair with the key equals to the union of the two ID separated by a "-" : "productID-customerID"
+                        //The value of the pair is the customerID, however it will be replaced in the following phases
+                        pairs.add(new Tuple2<>(productID + "-" + customerID, customerID));
                     }
                     return pairs.iterator();
-                }).distinct(); //TODO: Remove the distinct method
+                }).groupByKey().mapToPair(a -> {
+                    //After grouping the couples that have the same key, so same productID and customerID, We parse the key into productID and customerID
+                    String[] tokens = a._1.split("-");
+                    return new Tuple2<String, Long>(tokens[0], Long.parseLong(tokens[1]));
+                });
 
         System.out.println("Number of rows after filtering = " + productCustomer.count());
 
