@@ -42,7 +42,7 @@ public class G074HW1{
 
         //Task 1
         //Print the number of rows read from the input file
-        System.out.println("Number of rows read from the input file = " + rawData.count());
+        System.out.println("Number of rows = " + rawData.count());
 
         JavaPairRDD<String, Integer> productCustomer;
 
@@ -69,7 +69,7 @@ public class G074HW1{
                     return new Tuple2<>(tokens[0], Integer.parseInt(tokens[1]));
                 });
 
-        System.out.println("Number of rows after filtering = " + productCustomer.count());
+        System.out.println("Product-Customer Pairs = " + productCustomer.count());
 
 
         //Task3
