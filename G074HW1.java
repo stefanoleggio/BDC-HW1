@@ -114,11 +114,11 @@ public class G074HW1{
         //Create comparator
         Comparator<Tuple2<String, Integer>> comparator = Comparator.comparing(Tuple2::_2);
 
-
+        /* TODO: Resolve Spark error
         productPopularity1.takeOrdered(H, comparator).parallelStream().forEach((line)->
                 System.out.println("Product "+line._1+" Occurrence "+line._2));
 
-
+        */
 
         //Task6
 
