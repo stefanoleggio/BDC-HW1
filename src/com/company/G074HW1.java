@@ -73,6 +73,38 @@ public class G074HW1{
 
 
         //Task3
+        //Use mapPartitionsToPair/mapPartitions and combined with the groupByKey and mapValues or mapToPair/map methods
+
+        JavaPairRDD<String, Integer> productPopularity1;
+
+        productPopularity1 = productCustomer
+                .mapPartitionsToPair((element) -> {    // <-- REDUCE PHASE (R1)
+                    HashMap<String, Integer> counts = new HashMap<>();
+                    while (element.hasNext()){
+                        Tuple2<String, Integer> tuple = element.next();
+                        counts.put(tuple._1(), 1 + counts.getOrDefault(tuple._1(), 0));
+                    }
+                    ArrayList<Tuple2<String, Integer>> pairs = new ArrayList<>();
+                    for (Map.Entry<String, Integer> e : counts.entrySet()) {
+                        pairs.add(new Tuple2<>(e.getKey(), e.getValue()));
+                    }
+                    return pairs.iterator();
+                }).groupByKey()     // <-- SHUFFLE+GROUPING
+                .mapValues((it) -> { // <-- REDUCE PHASE (R2)
+                    Integer sum = 0;
+                    for (Integer c : it) {
+                        sum += c;
+                    }
+                    return sum;
+                }); // Obs: one could use reduceByKey in place of groupByKey and mapValues
+
+        System.out.println("Couple Popularity (ProductId -> Occurrence)");
+        for (Tuple2<String, Integer> test : productPopularity1.take(10)) //or pairRdd.collect()
+        {
+            System.out.print(test._1 + " ");
+            System.out.println(test._2);
+        }
+        
 
         //Task4
 
