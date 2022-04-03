@@ -104,11 +104,21 @@ public class G074HW1{
             System.out.print(test._1 + " ");
             System.out.println(test._2);
         }
-        
+
 
         //Task4
 
         //Task5
+        System.out.println("Couple Popularity (ProductId -> Occurrence)");
+
+        //Create comparator
+        Comparator<Tuple2<String, Integer>> comparator = Comparator.comparing(Tuple2::_2);
+
+
+        productPopularity1.takeOrdered(H, comparator).parallelStream().forEach((line)->
+                System.out.println("Product "+line._1+" Occurrence "+line._2));
+
+
 
         //Task6
 
