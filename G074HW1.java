@@ -6,6 +6,7 @@ import org.apache.spark.api.java.JavaSparkContext;
 import scala.Tuple2;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class G074HW1{
 
@@ -98,21 +99,23 @@ public class G074HW1{
                     return sum;
                 }); // Obs: one could use reduceByKey in place of groupByKey and mapValues
 
-        System.out.println("Couple Popularity (ProductId -> Occurrence)");
-        for (Tuple2<String, Integer> test : productPopularity1.take(10)) //or pairRdd.collect()
-        {
-            System.out.print(test._1 + " ");
-            System.out.println(test._2);
-        }
-
 
         //Task4
 
         //Task5
-        System.out.println("Couple Popularity (ProductId -> Occurrence)");
+        if(H > 0){
+            JavaPairRDD<Integer,String> topElemets = productPopularity1.mapToPair(x -> new Tuple2<>(x._2, x._1)).sortByKey(false).repartition(1);
+            System.out.println("Top 5 Products and their Popularities");
+            for(Tuple2<Integer, String > element : topElemets.take(H)) {
+                System.out.print("Product: " + element._2 + " ");
+                System.out.println("Popularity: " + element._1 + ";");
+            }
+        }
+
+        //System.out.println("Couple Popularity (ProductId -> Occurrence)");
 
         //Create comparator
-        Comparator<Tuple2<String, Integer>> comparator = Comparator.comparing(Tuple2::_2);
+        //Comparator<Tuple2<String, Integer>> comparator = Comparator.comparing(Tuple2::_2);
 
         /* TODO: Resolve Spark error
         productPopularity1.takeOrdered(H, comparator).parallelStream().forEach((line)->
@@ -121,7 +124,9 @@ public class G074HW1{
         */
 
         //Task6
+        if(H == 0) {
 
+        }
     }
 
 }
