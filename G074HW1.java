@@ -79,24 +79,24 @@ public class G074HW1{
         JavaPairRDD<String, Integer> productPopularity1;
 
         productPopularity1 = productCustomer
-                .mapPartitionsToPair((element) -> {    // <-- REDUCE PHASE (R1)
-                    HashMap<String, Integer> counts = new HashMap<>();
-                    while (element.hasNext()){
+                .mapPartitionsToPair((element) -> {    // <-- REDUCE PHASE (R1) (For each partition apply this function within the partition pairs)
+                    HashMap<String, Integer> counts = new HashMap<>(); //hashmap
+                    while (element.hasNext()){ //count the popularity of each product iterating through elements of each singular partition
                         Tuple2<String, Integer> tuple = element.next();
-                        counts.put(tuple._1(), 1 + counts.getOrDefault(tuple._1(), 0));
+                        counts.put(tuple._1(), 1 + counts.getOrDefault(tuple._1(), 0)); //increment of 1 the value of popularity within the partition
                     }
                     ArrayList<Tuple2<String, Integer>> pairs = new ArrayList<>();
                     for (Map.Entry<String, Integer> e : counts.entrySet()) {
-                        pairs.add(new Tuple2<>(e.getKey(), e.getValue()));
+                        pairs.add(new Tuple2<>(e.getKey(), e.getValue()));//add to the arraylist each distinct pair (productID, popularity) within the partition
                     }
-                    return pairs.iterator();
-                }).groupByKey()     // <-- SHUFFLE+GROUPING
+                    return pairs.iterator(); //we have to return an iterator over the distinct pairs (productID, popularity)
+                }).groupByKey()     // <-- SHUFFLE+GROUPING among different partitions to obtain a single partition
                 .mapValues((it) -> { // <-- REDUCE PHASE (R2)
                     Integer sum = 0;
-                    for (Integer c : it) {
+                    for (Integer c : it) { //sum up all the partial sums of product popularities
                         sum += c;
                     }
-                    return sum;
+                    return sum; //return the final sum which will be applied to the values of the pairs (PRODUCTID, popularity <-)
                 }); // Obs: one could use reduceByKey in place of groupByKey and mapValues
 
 
