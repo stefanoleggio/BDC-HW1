@@ -125,6 +125,25 @@ public class G074HW1{
 
         //Task6
         if(H == 0) {
+            //Return a list ordered
+
+            JavaPairRDD<String,Integer> Elements1 = productPopularity1.sortByKey(true).repartition(1);
+            System.out.println("List of increasing lexicographic order of ProductID");
+            for(Tuple2<String, Integer > element : Elements1.collect()) {
+                System.out.print("Product: " + element._1 + " ");
+                System.out.println("Popularity: " + element._2 + ";");
+            }
+
+            /*
+            JavaPairRDD<String,Integer> Elements2 = productPopularity2.sortByKey(true).repartition(1);
+            System.out.println("List of increasing lexicographic order of ProductID");
+            for(Tuple2<String, Integer > element : Elements2.collect()) {
+                System.out.print("Product: " + element._1 + " ");
+                System.out.println("Popularity: " + element._2 + ";");
+            }
+
+             */
+
 
         }
     }
