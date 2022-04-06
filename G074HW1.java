@@ -101,24 +101,14 @@ public class G074HW1{
                 }); // Obs: one could use reduceByKey in place of groupByKey and mapValues
 
 
-
-
         //Task4: Repeats the operation of the previous point using a combination of map/mapToPair and reduceByKey methods
         System.out.println("TASK 4: ");
-
         JavaPairRDD<String, Integer> productPopularity2;
-        HashMap<String, Integer> counts = new HashMap<>(); //hashmap
 
         productPopularity2 = productCustomer.mapToPair((elem) ->{
-            counts.put(elem._1, 1 + counts.getOrDefault(elem._1,0)); //increment in the hashmap the count of the current product, or, if the product is not present in the hashmap, initialize its count to 0
-            return new Tuple2<>(elem._1,counts.get(elem._1));
-        });
+           return new Tuple2<String,Integer>(elem._1,1); //First we map (PRODUCTID, CUSTOMERID) into (PRODUCTID, 1) pairs:
+        }).reduceByKey((x,y) -> x+y);; //then we reduce all the pairs (PRODUCTID, 1) summing all the occurences for each single key (PRODUCTID, sum())
 
-        System.out.println("Product-popularity Pairs = " + productPopularity2.count());
-
-
-
-        
 
         //Task5
         System.out.println("TASK 5: ");
