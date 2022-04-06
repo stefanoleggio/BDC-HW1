@@ -130,10 +130,10 @@ public class G074HW1{
                 System.out.print("Product: " + element._2 + " ");
                 System.out.println("Popularity: " + element._1 + ";");
             }
-        }
+            System.out.println("TASK 5 DONE");
+        }//end if
 
-        System.out.println("TASK 5 DONE");
-        
+
 
         //Task6
         if(H == 0) {
@@ -151,6 +151,7 @@ public class G074HW1{
                 System.out.print("Product: " + element._1 + " ");
                 System.out.println("Popularity: " + element._2 + ";");
             }
+            System.out.println("TASK 6 DONE");
         } //end if
 
     }
