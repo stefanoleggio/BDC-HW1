@@ -133,27 +133,19 @@ public class G074HW1{
         }
 
         System.out.println("TASK 5 DONE");
-
-        /*
-        //PROVA LANDO
-        //Create comparator
-        Comparator<Tuple2<String, Integer>> comparator = Comparator.comparing(Tuple2::_2);
-        // TODO: Resolve Spark error
-        productPopularity1.takeOrdered(H, comparator).parallelStream().forEach((line)->
-                System.out.println("Product "+line._1+" Occurrence "+line._2));
-        */
+        
 
         //Task6
         if(H == 0) {
 
-            JavaPairRDD<String,Integer> Elements1 = productPopularity1.sortByKey(true).repartition(1);
+            JavaPairRDD<String, Integer> Elements1 = productPopularity1.sortByKey(true).repartition(1);
             System.out.println("List of increasing lexicographic order of ProductID");
-            for(Tuple2<String, Integer > element : Elements1.collect()) {
+            for (Tuple2<String, Integer> element : Elements1.collect()) {
                 System.out.print("Product: " + element._1 + " ");
                 System.out.println("Popularity: " + element._2 + ";");
             }
 
-            /*
+
             JavaPairRDD<String,Integer> Elements2 = productPopularity2.sortByKey(true).repartition(1);
             System.out.println("List of increasing lexicographic order of ProductID");
             for(Tuple2<String, Integer > element : Elements2.collect()) {
@@ -161,7 +153,8 @@ public class G074HW1{
                 System.out.println("Popularity: " + element._2 + ";");
             }
 
-             */
+
+        }
 
 
 
@@ -188,9 +181,6 @@ public class G074HW1{
         }
 */
 
-        if(H == 0) {
-            //TODO: move code here for task 6
-        }
     }
 
 }
