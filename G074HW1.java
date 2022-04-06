@@ -145,41 +145,13 @@ public class G074HW1{
                 System.out.println("Popularity: " + element._2 + ";");
             }
 
-
             JavaPairRDD<String,Integer> Elements2 = productPopularity2.sortByKey(true).repartition(1);
             System.out.println("List of increasing lexicographic order of ProductID using result of task 4");
             for(Tuple2<String, Integer > element : Elements2.collect()) {
                 System.out.print("Product: " + element._1 + " ");
                 System.out.println("Popularity: " + element._2 + ";");
             }
-
-
-        }
-
-
-
-        /*
-        //PROVA DAVIDE
-        System.out.println("TASK 6:");
-        List<Tuple2<String,Integer>> productPopularityList = productPopularity1.collect();
-
-        //implement a comparator
-        class SortProductsPopularitiesByKey implements Comparator<Tuple2<String,Integer>> {
-
-            // Method
-            // Sorting in ascending order of name
-            public int compare(Tuple2<String,Integer> a, Tuple2<String,Integer> b)
-            {
-                return a._1.compareTo(b._1);
-            }
-        }
-        //sort the list using the comparator
-        SortProductsPopularitiesByKey comparator = new SortProductsPopularitiesByKey();
-        productPopularityList.sort(comparator);
-        for(Tuple2<String,Integer> elem : productPopularityList) {
-            System.out.println(elem);
-        }
-*/
+        } //end if
 
     }
 
