@@ -119,13 +119,13 @@ public class G074HW1{
         //Task5
         if(H > 0){
             JavaPairRDD<Integer,String> topElemets = productPopularity1.mapToPair(x -> new Tuple2<>(x._2, x._1)).sortByKey(false).repartition(1);
-            System.out.println("Top 5 Products and their Popularities (using task 3)");
+            System.out.println("Top 5 Products and their Popularities (using result of task 3)");
             for(Tuple2<Integer, String > element : topElemets.take(H)) {
                 System.out.print("Product: " + element._2 + " ");
                 System.out.println("Popularity: " + element._1 + ";");
             }
             topElemets = productPopularity2.mapToPair(x -> new Tuple2<>(x._2, x._1)).sortByKey(false).repartition(1);
-            System.out.println("Top 5 Products and their Popularities (using task 4)");
+            System.out.println("Top 5 Products and their Popularities (using result of task 4)");
             for(Tuple2<Integer, String > element : topElemets.take(H)) {
                 System.out.print("Product: " + element._2 + " ");
                 System.out.println("Popularity: " + element._1 + ";");
@@ -139,7 +139,7 @@ public class G074HW1{
         if(H == 0) {
 
             JavaPairRDD<String, Integer> Elements1 = productPopularity1.sortByKey(true).repartition(1);
-            System.out.println("List of increasing lexicographic order of ProductID");
+            System.out.println("List of increasing lexicographic order of ProductID (using result of task3");
             for (Tuple2<String, Integer> element : Elements1.collect()) {
                 System.out.print("Product: " + element._1 + " ");
                 System.out.println("Popularity: " + element._2 + ";");
@@ -147,7 +147,7 @@ public class G074HW1{
 
 
             JavaPairRDD<String,Integer> Elements2 = productPopularity2.sortByKey(true).repartition(1);
-            System.out.println("List of increasing lexicographic order of ProductID");
+            System.out.println("List of increasing lexicographic order of ProductID using result of task 4");
             for(Tuple2<String, Integer > element : Elements2.collect()) {
                 System.out.print("Product: " + element._1 + " ");
                 System.out.println("Popularity: " + element._2 + ";");
