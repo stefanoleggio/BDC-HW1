@@ -3,6 +3,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 import java.io.IOException;
 import java.util.*;
@@ -44,10 +45,12 @@ public class G074HW1{
         //Task 1
         //Print the number of rows read from the input file
         System.out.println("Number of rows = " + rawData.count());
+        System.out.println("TASK 1 DONE");
 
-        JavaPairRDD<String, Integer> productCustomer;
 
         //Task 2
+        JavaPairRDD<String, Integer> productCustomer;
+
         productCustomer = rawData
                 .flatMapToPair((line) -> {
                     //Parsing
@@ -71,6 +74,7 @@ public class G074HW1{
                 });
 
         System.out.println("Product-Customer Pairs = " + productCustomer.count());
+        System.out.println("TASK 2 DONE");
 
 
         //Task3
@@ -80,7 +84,7 @@ public class G074HW1{
 
         productPopularity1 = productCustomer
                 .mapPartitionsToPair((element) -> {    // <-- REDUCE PHASE (R1) (For each partition apply this function within the partition pairs)
-                    HashMap<String, Integer> counts = new HashMap<>(); //hashmap
+                    HashMap<String, Integer> counts = new HashMap<>(); //hashmap which will contain the mapping PRODUCTID -> POPULARITY
                     while (element.hasNext()){ //count the popularity of each product iterating through elements of each singular partition
                         Tuple2<String, Integer> tuple = element.next();
                         counts.put(tuple._1(), 1 + counts.getOrDefault(tuple._1(), 0)); //increment of 1 the value of popularity within the partition
@@ -99,33 +103,48 @@ public class G074HW1{
                     return sum; //return the final sum which will be applied to the values of the pairs (PRODUCTID, popularity <-)
                 }); // Obs: one could use reduceByKey in place of groupByKey and mapValues
 
+        System.out.println("TASK 3 DONE");
 
-        //Task4
+
+        //Task4: Repeats the operation of the previous point using a combination of map/mapToPair and reduceByKey methods
+        JavaPairRDD<String, Integer> productPopularity2;
+
+        productPopularity2 = productCustomer.mapToPair((elem) ->{
+           return new Tuple2<String,Integer>(elem._1,1); //First we map (PRODUCTID, CUSTOMERID) into (PRODUCTID, 1) pairs:
+        }).reduceByKey((x,y) -> x+y);; //then we reduce all the pairs (PRODUCTID, 1) summing all the occurences for each single key (PRODUCTID, sum())
+
+        System.out.println("TASK 4 DONE");
+
 
         //Task5
         if(H > 0){
             JavaPairRDD<Integer,String> topElemets = productPopularity1.mapToPair(x -> new Tuple2<>(x._2, x._1)).sortByKey(false).repartition(1);
-            System.out.println("Top 5 Products and their Popularities");
+            System.out.println("Top 5 Products and their Popularities (using task 3)");
+            for(Tuple2<Integer, String > element : topElemets.take(H)) {
+                System.out.print("Product: " + element._2 + " ");
+                System.out.println("Popularity: " + element._1 + ";");
+            }
+            topElemets = productPopularity2.mapToPair(x -> new Tuple2<>(x._2, x._1)).sortByKey(false).repartition(1);
+            System.out.println("Top 5 Products and their Popularities (using task 4)");
             for(Tuple2<Integer, String > element : topElemets.take(H)) {
                 System.out.print("Product: " + element._2 + " ");
                 System.out.println("Popularity: " + element._1 + ";");
             }
         }
 
-        //System.out.println("Couple Popularity (ProductId -> Occurrence)");
+        System.out.println("TASK 5 DONE");
 
+        /*
+        //PROVA LANDO
         //Create comparator
-        //Comparator<Tuple2<String, Integer>> comparator = Comparator.comparing(Tuple2::_2);
-
-        /* TODO: Resolve Spark error
+        Comparator<Tuple2<String, Integer>> comparator = Comparator.comparing(Tuple2::_2);
+        // TODO: Resolve Spark error
         productPopularity1.takeOrdered(H, comparator).parallelStream().forEach((line)->
                 System.out.println("Product "+line._1+" Occurrence "+line._2));
-
         */
 
         //Task6
         if(H == 0) {
-            //Return a list ordered
 
             JavaPairRDD<String,Integer> Elements1 = productPopularity1.sortByKey(true).repartition(1);
             System.out.println("List of increasing lexicographic order of ProductID");
@@ -145,6 +164,32 @@ public class G074HW1{
              */
 
 
+
+        /*
+        //PROVA DAVIDE
+        System.out.println("TASK 6:");
+        List<Tuple2<String,Integer>> productPopularityList = productPopularity1.collect();
+
+        //implement a comparator
+        class SortProductsPopularitiesByKey implements Comparator<Tuple2<String,Integer>> {
+
+            // Method
+            // Sorting in ascending order of name
+            public int compare(Tuple2<String,Integer> a, Tuple2<String,Integer> b)
+            {
+                return a._1.compareTo(b._1);
+            }
+        }
+        //sort the list using the comparator
+        SortProductsPopularitiesByKey comparator = new SortProductsPopularitiesByKey();
+        productPopularityList.sort(comparator);
+        for(Tuple2<String,Integer> elem : productPopularityList) {
+            System.out.println(elem);
+        }
+*/
+
+        if(H == 0) {
+            //TODO: move code here for task 6
         }
     }
 
