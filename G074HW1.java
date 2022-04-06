@@ -3,6 +3,7 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 import java.io.IOException;
 import java.util.*;
@@ -80,7 +81,7 @@ public class G074HW1{
 
         productPopularity1 = productCustomer
                 .mapPartitionsToPair((element) -> {    // <-- REDUCE PHASE (R1) (For each partition apply this function within the partition pairs)
-                    HashMap<String, Integer> counts = new HashMap<>(); //hashmap
+                    HashMap<String, Integer> counts = new HashMap<>(); //hashmap which will contain the mapping PRODUCTID -> POPULARITY
                     while (element.hasNext()){ //count the popularity of each product iterating through elements of each singular partition
                         Tuple2<String, Integer> tuple = element.next();
                         counts.put(tuple._1(), 1 + counts.getOrDefault(tuple._1(), 0)); //increment of 1 the value of popularity within the partition
@@ -100,12 +101,37 @@ public class G074HW1{
                 }); // Obs: one could use reduceByKey in place of groupByKey and mapValues
 
 
-        //Task4
+
+
+        //Task4: Repeats the operation of the previous point using a combination of map/mapToPair and reduceByKey methods
+        System.out.println("TASK 4: ");
+
+        JavaPairRDD<String, Integer> productPopularity2;
+        HashMap<String, Integer> counts = new HashMap<>(); //hashmap
+
+        productPopularity2 = productCustomer.mapToPair((elem) ->{
+            counts.put(elem._1, 1 + counts.getOrDefault(elem._1,0)); //increment in the hashmap the count of the current product, or, if the product is not present in the hashmap, initialize its count to 0
+            return new Tuple2<>(elem._1,counts.get(elem._1));
+        });
+
+        System.out.println("Product-popularity Pairs = " + productPopularity2.count());
+
+
+
+        
 
         //Task5
+        System.out.println("TASK 5: ");
+
         if(H > 0){
             JavaPairRDD<Integer,String> topElemets = productPopularity1.mapToPair(x -> new Tuple2<>(x._2, x._1)).sortByKey(false).repartition(1);
-            System.out.println("Top 5 Products and their Popularities");
+            System.out.println("Top 5 Products and their Popularities (using task 3)");
+            for(Tuple2<Integer, String > element : topElemets.take(H)) {
+                System.out.print("Product: " + element._2 + " ");
+                System.out.println("Popularity: " + element._1 + ";");
+            }
+            topElemets = productPopularity2.mapToPair(x -> new Tuple2<>(x._2, x._1)).sortByKey(false).repartition(1);
+            System.out.println("Top 5 Products and their Popularities (using task 4)");
             for(Tuple2<Integer, String > element : topElemets.take(H)) {
                 System.out.print("Product: " + element._2 + " ");
                 System.out.println("Popularity: " + element._1 + ";");
