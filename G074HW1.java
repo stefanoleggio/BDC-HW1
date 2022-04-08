@@ -3,11 +3,9 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
-import org.apache.spark.api.java.function.PairFunction;
 import scala.Tuple2;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class G074HW1{
 
@@ -17,22 +15,13 @@ public class G074HW1{
             throw new IllegalArgumentException("USAGE: num_partitions num_products country file_path");
         }
 
-
-        /**
-         *
-         * Spark Setup
-         *
-         */
+        //Spark setup
 
         SparkConf conf = new SparkConf(true).setAppName("G074HW1");
         JavaSparkContext sc = new JavaSparkContext(conf);
         sc.setLogLevel("WARN");
 
-        /**
-         *
-         * Input Reading
-         *
-         */
+        //Input reading
 
         int K = Integer.parseInt(args[0]); //Number of partitions
         int H = Integer.parseInt(args[1]); //Number of products
@@ -46,7 +35,6 @@ public class G074HW1{
         //Print the number of rows read from the input file
         System.out.println("Number of rows = " + rawData.count());
         System.out.println("TASK 1 DONE");
-
 
         //Task 2
         JavaPairRDD<String, Integer> productCustomer;
@@ -76,7 +64,6 @@ public class G074HW1{
         System.out.println("Product-Customer Pairs = " + productCustomer.count());
         System.out.println("TASK 2 DONE");
 
-
         //Task3
         //Use mapPartitionsToPair/mapPartitions and combined with the groupByKey and mapValues or mapToPair/map methods
 
@@ -105,7 +92,6 @@ public class G074HW1{
 
         System.out.println("TASK 3 DONE");
 
-
         //Task4: Repeats the operation of the previous point using a combination of map/mapToPair and reduceByKey methods
         JavaPairRDD<String, Integer> productPopularity2;
 
@@ -115,17 +101,16 @@ public class G074HW1{
 
         System.out.println("TASK 4 DONE");
 
-
         //Task5
         if(H > 0){
             JavaPairRDD<Integer,String> topElemets = productPopularity1.mapToPair(x -> new Tuple2<>(x._2, x._1)).sortByKey(false).repartition(1);
-            System.out.println("Top 5 Products and their Popularities (using result of task 3)");
+            System.out.println("Top " + H + " Products and their Popularities (using result of task 3)");
             for(Tuple2<Integer, String > element : topElemets.take(H)) {
                 System.out.print("Product: " + element._2 + " ");
                 System.out.println("Popularity: " + element._1 + ";");
             }
             topElemets = productPopularity2.mapToPair(x -> new Tuple2<>(x._2, x._1)).sortByKey(false).repartition(1);
-            System.out.println("Top 5 Products and their Popularities (using result of task 4)");
+            System.out.println("Top " + H +" Products and their Popularities (using result of task 4)");
             for(Tuple2<Integer, String > element : topElemets.take(H)) {
                 System.out.print("Product: " + element._2 + " ");
                 System.out.println("Popularity: " + element._1 + ";");
@@ -134,18 +119,16 @@ public class G074HW1{
         }//end if
 
 
-
         //Task6
         if(H == 0) {
-
-            JavaPairRDD<String, Integer> Elements1 = productPopularity1.sortByKey(true).repartition(1);
+            JavaPairRDD<String, Integer> Elements1 = productPopularity1.sortByKey().repartition(1);
             System.out.println("List of increasing lexicographic order of ProductID (using result of task3");
             for (Tuple2<String, Integer> element : Elements1.collect()) {
                 System.out.print("Product: " + element._1 + " ");
                 System.out.println("Popularity: " + element._2 + ";");
             }
 
-            JavaPairRDD<String,Integer> Elements2 = productPopularity2.sortByKey(true).repartition(1);
+            JavaPairRDD<String,Integer> Elements2 = productPopularity2.sortByKey().repartition(1);
             System.out.println("List of increasing lexicographic order of ProductID using result of task 4");
             for(Tuple2<String, Integer > element : Elements2.collect()) {
                 System.out.print("Product: " + element._1 + " ");
@@ -155,5 +138,4 @@ public class G074HW1{
         } //end if
 
     }
-
 }
